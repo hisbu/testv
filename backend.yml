@@ -1,0 +1,105 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: rigup
+  labels:
+    app: rigup
+    type: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: backend
+  template:
+    metadata:
+      namespace: rigup
+      labels:
+        app: rigup
+        type: backend
+    spec: 
+      containers:
+        - name: backend-server
+          image: tiff19/backend-rigup
+          env:
+            - name: NQ_DB_HOST
+              value: db-rigup
+            - name: NQ_DB_USER
+              value: root
+            - name: NQ_DB_PASSWORD
+              value: password
+            - name: NQ_DB_NAME
+              value: dbrigup
+          ports:
+            - containerPort: 2001
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-backend
+  namespace: rigup
+  labels:
+    app: rigup
+    type: backend
+spec:
+  type: NodePort
+  selector:
+    type: backend
+  ports:
+    - port: 2001
+      targetPort: 2001
+      nodePort: 30012
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-deployment
+  namespace: rigup
+  labels:
+    app: rigup
+    type: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rigup
+  template:
+    metadata:
+      namespace: rigup
+      labels:
+        app: rigup
+        type: database
+    spec:
+      containers:
+        - name: database-server
+          image: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+            - name: MYSQL_DATABASE
+              value: dbrigup
+          ports:
+            - containerPort: 3306
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-rigup
+  namespace: rigup
+  labels:
+    app: rigup
+    type: database
+spec:
+  selector:
+    type: database
+  ports:
+    - port: 3306
+      targetPort: 3306

@@ -1,0 +1,1 @@
+sed "s/tagVersion/$1/g" backend.yml > backend-config-k8s.yml
