@@ -15,7 +15,7 @@ pipeline {
         stage('Build docker image') {
             steps {
                 script {
-                	app = docker.build( hisbu/backend-rigup")
+                	app = docker.build( "hisbu/backend-rigup")
                 }
             }
         }
@@ -51,8 +51,8 @@ pipeline {
                 sh 'chmod +x changeTag.sh'
                 sh "./changeTag.sh ${DOCKER_TAG}"
                 sshagent(['kubeAccess']) {
-                    sh "scp -o StrictHostKeyChecking=no backend.yml tiffany@34.101.239.207:/home/tiffany/"
-                    sh "ssh tiffany@34.101.239.207 sudo kubectl apply -f ."
+                    sh "scp -o StrictHostKeyChecking=no backend.yml hisbu@35.198.224.116:/home/tiffany/"
+                    sh "ssh hisbu@35.198.224.116 sudo kubectl apply -f ."
                 }
             }
         }
